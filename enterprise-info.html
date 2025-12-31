@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可信企业信息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* 手机状态栏模拟 - 改为相对定位，避免遮挡 */
+        .phone-status {
+            position: relative;
+            height: 30px;
+            background-color: #000;
+            color: #fff;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 1000;
+            margin-bottom: 10px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background-color: #fff;
+            border: 8px solid #e61c23;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            margin-top: 0;
+        }
+
+        /* 确保页面可以滚动 */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            overflow-y: auto;
+        }
+
+        /* 移除顶部栏，使用容器边框代替 */
+        .header {
+            display: none;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            color: #e61c23;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .enterprise-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .hot-sales {
+            position: absolute;
+            top: 8px;
+            right: 16px;
+            background-color: #ff4500;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 69, 0, 0.4);
+        }
+
+        /* 徽章区域 */
+        .badge-section {
+            padding: 30px 0 20px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .badge-container {
+            display: inline-block;
+            position: relative;
+        }
+
+        .badge {
+            width: 120px;
+            height: 120px;
+        }
+
+        .badge-background {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+        }
+
+        .badge-shield {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid #ffd700;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge-shield::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 12px solid #ffd700;
+        }
+
+        .badge-text {
+            font-size: 36px;
+            font-weight: bold;
+            color: #e61c23;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge-ribbon {
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #e61c23;
+            padding: 4px 20px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #ffd700;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge-stars {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #ffd700;
+            font-size: 10px;
+        }
+
+        .wreath {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 50% 50% 0 0;
+            clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+            opacity: 0.3;
+        }
+
+        .wreath::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            width: 130px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 0 0 50% 50%;
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+        }
+
+        /* 输入文字区域 */
+        .input-section {
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        .input-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e90ff;
+            margin-bottom: 12px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .verified-tag {
+            display: inline-block;
+            background-color: #28a745;
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 信息分隔线 */
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 16px;
+        }
+
+        /* 信息区域 */
+        .info-section {
+            padding: 0 16px 16px;
+        }
+
+        .info-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #666;
+            width: 120px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            text-align: right;
+        }
+
+        .special-plan {
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        /* 经营范围 */
+        .business-scope {
+            text-align: left;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 徽章区域 -->
+        <div class="badge-section">
+            <div style="position: relative; width: 220px; height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <!-- 使用内联SVG替换图片 -->
+                <svg width="200" height="260" viewBox="0 0 1280 1280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 左侧麦穗 -->
+                    <path d="M350 100L300 150L330 200L280 250L310 300L260 350L290 400L240 450L270 500L220 550L250 600L200 650L230 700L180 750L210 800" stroke="#FF9800" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="#FF9800"/>
+                    <path d="M370 130L320 180L350 230L300 280L330 330L280 380L310 430L260 480L290 530L240 580L270 630L220 680L250 730L200 780L230 830" stroke="#FF9800" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="#FF9800"/>
+                    <path d="M390 160L340 210L370 260L320 310L350 360L300 410L330 460L280 510L310 560L260 610L290 660L240 710L270 760L220 810L250 860" stroke="#FF9800" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="#FF9800"/>
+                    
+                    <!-- 右侧麦穗 -->
+                    <path d="M930 100L980 150L950 200L1000 250L970 300L1020 350L990 400L1040 450L1010 500L1060 550L1030 600L1080 650L1050 700L1100 750L1070 800" stroke="#FF9800" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="#FF9800"/>
+                    <path d="M910 130L960 180L930 230L980 280L950 330L1000 380L970 430L1020 480L990 530L1040 580L1010 630L1060 680L1030 730L1080 780L1050 830" stroke="#FF9800" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="#FF9800"/>
+                    <path d="M890 160L940 210L910 260L960 310L930 360L980 410L950 460L1000 510L970 560L1020 610L990 660L1040 710L1010 760L1060 810L1030 860" stroke="#FF9800" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="#FF9800"/>
+                    
+                    <!-- 盾牌主体 -->
+                    <path d="M640 150L1000 300L1000 600L800 800L480 800L280 600L280 300L640 150Z" fill="#FF9800"/>
+                    <path d="M640 200L950 325L950 575L775 750L505 750L330 575L330 325L640 200Z" fill="#FF9800" stroke="#FFFFFF" stroke-width="30"/>
+                    
+                    <!-- 信字 -->
+                    <text x="640" y="520" font-size="320" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-family="SimHei, sans-serif">信</text>
+                    
+                    <!-- 盾牌上的星星 -->
+                    <path d="M450 550L465 580L495 585L475 605L480 635L450 620L420 635L425 605L405 585L435 580Z" fill="#FFFFFF"/>
+                    <path d="M550 600L565 630L595 635L575 655L580 685L550 670L520 685L525 655L505 635L535 630Z" fill="#FFFFFF"/>
+                    <path d="M650 600L665 630L695 635L675 655L680 685L650 670L620 685L625 655L605 635L635 630Z" fill="#FFFFFF"/>
+                    <path d="M750 550L765 580L795 585L775 605L780 635L750 620L720 635L725 605L705 585L735 580Z" fill="#FFFFFF"/>
+                    <path d="M430 480L440 500L455 505L445 515L445 530L430 525L415 530L415 515L405 505L420 500Z" fill="#FFFFFF"/>
+                    <path d="M850 480L860 500L875 505L865 515L865 530L850 525L835 530L835 515L825 505L840 500Z" fill="#FFFFFF"/>
+                    
+                    <!-- 底部横幅 -->
+                    <path d="M400 800L960 800L1010 900L350 900L400 800Z" fill="#FF9800"/>
+                    <text x="680" y="865" font-size="120" font-weight="bold" fill="#FFFFFF" text-anchor="middle" font-family="SimHei, sans-serif">可信企业</text>
+                    <path d="M450 850L480 880L450 910L420 880L450 850Z" fill="#FFFFFF"/>
+                    <path d="M910 850L940 880L910 910L880 880L910 850Z" fill="#FFFFFF"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 输入文字区域 -->
+        <div class="input-section">
+            <div class="input-title">扶摇教育文化</div>
+            <div class="verified-tag">已认定</div>
+        </div>
+
+        <!-- 分隔线 -->
+        <div class="divider"></div>
+
+        <!-- 基本信息 -->
+        <div class="info-section">
+            <div class="info-title">基本信息</div>
+            <div class="info-item">
+                <div class="info-label">企业简称</div>
+                <div class="info-value">扶摇教育文化</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">行业分类</div>
+                <div class="info-value">教育行业</div>
+            </div>
+            
+        </div>
+
+        <!-- 分隔线 -->
+        <div class="divider"></div>
+
+        <!-- 主体证件信息 -->
+        <div class="info-section">
+            <div class="info-title">主体证件信息</div>
+            <div class="info-item">
+                <div class="info-label">企业类型</div>
+                <div class="info-value">教育行业</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">企业成立日期</div>
+                <div class="info-value">2023年8月6日</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">企业经营期限</div>
+                <div class="info-value">长期</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">经营范围</div>
+                <div class="info-value business-scope">
+                    教育科技产品研发；软件开发；互联网信息服务；在线教育平台技术服务；教育软件销售；教育大数据分析服务；课程内容设计与制作；教育信息咨询；文化活动策划
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
